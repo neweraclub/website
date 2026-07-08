@@ -1,6 +1,12 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+-- Create missing ENUM types
+CREATE TYPE public.enrollment_status AS ENUM ('enrolled', 'completed', 'dropped');
+CREATE TYPE public.device_type AS ENUM ('desktop', 'mobile', 'tablet', 'unknown');
+CREATE TYPE public.session_status AS ENUM ('active', 'expired', 'revoked');
+CREATE TYPE public.user_role AS ENUM ('Administrator', 'Member');
+
 CREATE TABLE public.accounts (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   email character varying NOT NULL UNIQUE,
@@ -9,42 +15,39 @@ CREATE TABLE public.accounts (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT accounts_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.admin_actions (
+
+CREATE TABLE public.users (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  admin_name character varying NOT NULL,
-  action_type character varying NOT NULL CHECK (action_type::text = ANY (ARRAY['create'::character varying, 'update'::character varying, 'delete'::character varying]::text[])),
-  table_name character varying NOT NULL,
-  record_id character varying NOT NULL,
-  details text,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT admin_actions_pkey PRIMARY KEY (id)
-);
-CREATE TABLE public.contact_messages (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  first_name character varying NOT NULL,
-  last_name character varying NOT NULL,
-  email character varying NOT NULL,
-  subject character varying NOT NULL,
-  message text NOT NULL,
-  status character varying DEFAULT 'unread'::character varying CHECK (status::text = ANY (ARRAY['unread'::character varying, 'read'::character varying, 'replied'::character varying, 'archived'::character varying]::text[])),
+  account_id uuid NOT NULL,
+  full_name character varying NOT NULL,
+  field_of_interest character varying,
+  role user_role DEFAULT 'Member'::user_role,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT contact_messages_pkey PRIMARY KEY (id)
+  CONSTRAINT users_pkey PRIMARY KEY (id),
+  CONSTRAINT users_account_id_fkey FOREIGN KEY (account_id) REFERENCES public.accounts(id)
 );
-CREATE TABLE public.course_enrollments (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  course_id uuid NOT NULL,
-  user_id uuid NOT NULL,
-  status USER-DEFINED NOT NULL DEFAULT 'enrolled'::enrollment_status,
-  progress integer DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
-  collected_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT course_enrollments_pkey PRIMARY KEY (id),
-  CONSTRAINT course_enrollments_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id),
-  CONSTRAINT fk_course_enrollments_user FOREIGN KEY (user_id) REFERENCES public.users(id)
+
+CREATE TABLE public.user_sessions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  account_id uuid NOT NULL,
+  session_token text NOT NULL UNIQUE,
+  device_type device_type DEFAULT 'unknown'::device_type,
+  device_name character varying,
+  ip_address inet,
+  user_agent text,
+  location_country character varying,
+  location_city character varying,
+  status session_status DEFAULT 'active'::session_status,
+  last_activity timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT user_sessions_account_id_fkey FOREIGN KEY (account_id) REFERENCES public.accounts(id)
 );
+
 CREATE TABLE public.course_statuses (
-  id integer NOT NULL DEFAULT nextval('course_statuses_id_seq'::regclass),
+  id SERIAL NOT NULL,
   name character varying NOT NULL UNIQUE,
   display_name character varying,
   variant character varying DEFAULT 'outline'::character varying,
@@ -52,8 +55,9 @@ CREATE TABLE public.course_statuses (
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT course_statuses_pkey PRIMARY KEY (id)
 );
+
 CREATE TABLE public.course_types (
-  id integer NOT NULL DEFAULT nextval('course_types_id_seq'::regclass),
+  id SERIAL NOT NULL,
   name character varying NOT NULL UNIQUE,
   display_name character varying,
   variant character varying DEFAULT 'outline'::character varying,
@@ -61,6 +65,16 @@ CREATE TABLE public.course_types (
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT course_types_pkey PRIMARY KEY (id)
 );
+
+CREATE TABLE public.field_of_interest_options (
+  id SERIAL NOT NULL,
+  name character varying NOT NULL UNIQUE,
+  display_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT field_of_interest_options_pkey PRIMARY KEY (id)
+);
+
 CREATE TABLE public.courses (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   title character varying NOT NULL,
@@ -81,15 +95,20 @@ CREATE TABLE public.courses (
   CONSTRAINT courses_status_id_fkey FOREIGN KEY (status_id) REFERENCES public.course_statuses(id),
   CONSTRAINT courses_field_of_interest_id_fkey FOREIGN KEY (field_of_interest_id) REFERENCES public.field_of_interest_options(id)
 );
-CREATE TABLE public.event_tickets (
+
+CREATE TABLE public.course_enrollments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  event_id uuid,
-  user_id uuid,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT event_tickets_pkey PRIMARY KEY (id),
-  CONSTRAINT event_tickets_event_id_fkey FOREIGN KEY (event_id) REFERENCES public.events(id),
-  CONSTRAINT event_tickets_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+  course_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  status enrollment_status NOT NULL DEFAULT 'enrolled'::enrollment_status,
+  progress integer DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
+  collected_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT course_enrollments_pkey PRIMARY KEY (id),
+  CONSTRAINT course_enrollments_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id),
+  CONSTRAINT fk_course_enrollments_user FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+
 CREATE TABLE public.events (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   title character varying NOT NULL,
@@ -104,41 +123,17 @@ CREATE TABLE public.events (
   time time without time zone,
   CONSTRAINT events_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.field_of_interest_options (
-  id integer NOT NULL DEFAULT nextval('field_of_interest_options_id_seq'::regclass),
-  name character varying NOT NULL UNIQUE,
-  display_order integer DEFAULT 0,
-  is_active boolean DEFAULT true,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT field_of_interest_options_pkey PRIMARY KEY (id)
-);
-CREATE TABLE public.magazine_access (
+
+CREATE TABLE public.event_tickets (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
+  event_id uuid,
   user_id uuid,
-  magazine_id uuid,
-  access_type character varying DEFAULT 'full'::character varying,
-  granted_by uuid,
-  granted_at timestamp with time zone DEFAULT now(),
-  expires_at timestamp with time zone,
-  CONSTRAINT magazine_access_pkey PRIMARY KEY (id),
-  CONSTRAINT magazine_access_magazine_id_fkey FOREIGN KEY (magazine_id) REFERENCES public.magazines(id),
-  CONSTRAINT magazine_access_granted_by_fkey FOREIGN KEY (granted_by) REFERENCES public.users(id),
-  CONSTRAINT magazine_access_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.magazine_requests (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  magazine_id uuid,
-  status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying]::text[])),
-  message text,
-  reviewed_by uuid,
-  reviewed_at timestamp with time zone,
   created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT magazine_requests_pkey PRIMARY KEY (id),
-  CONSTRAINT magazine_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
-  CONSTRAINT magazine_requests_magazine_id_fkey FOREIGN KEY (magazine_id) REFERENCES public.magazines(id),
-  CONSTRAINT magazine_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
+  CONSTRAINT event_tickets_pkey PRIMARY KEY (id),
+  CONSTRAINT event_tickets_event_id_fkey FOREIGN KEY (event_id) REFERENCES public.events(id),
+  CONSTRAINT event_tickets_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
 );
+
 CREATE TABLE public.magazines (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   title character varying NOT NULL,
@@ -157,6 +152,60 @@ CREATE TABLE public.magazines (
   CONSTRAINT magazines_pkey PRIMARY KEY (id),
   CONSTRAINT magazines_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id)
 );
+
+CREATE TABLE public.magazine_access (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  magazine_id uuid,
+  access_type character varying DEFAULT 'full'::character varying,
+  granted_by uuid,
+  granted_at timestamp with time zone DEFAULT now(),
+  expires_at timestamp with time zone,
+  CONSTRAINT magazine_access_pkey PRIMARY KEY (id),
+  CONSTRAINT magazine_access_magazine_id_fkey FOREIGN KEY (magazine_id) REFERENCES public.magazines(id),
+  CONSTRAINT magazine_access_granted_by_fkey FOREIGN KEY (granted_by) REFERENCES public.users(id),
+  CONSTRAINT magazine_access_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.magazine_requests (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  magazine_id uuid,
+  status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying]::text[])),
+  message text,
+  reviewed_by uuid,
+  reviewed_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT magazine_requests_pkey PRIMARY KEY (id),
+  CONSTRAINT magazine_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id),
+  CONSTRAINT magazine_requests_magazine_id_fkey FOREIGN KEY (magazine_id) REFERENCES public.magazines(id),
+  CONSTRAINT magazine_requests_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES public.users(id)
+);
+
+CREATE TABLE public.admin_actions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  admin_name character varying NOT NULL,
+  action_type character varying NOT NULL CHECK (action_type::text = ANY (ARRAY['create'::character varying, 'update'::character varying, 'delete'::character varying]::text[])),
+  table_name character varying NOT NULL,
+  record_id character varying NOT NULL,
+  details text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_actions_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE public.contact_messages (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  first_name character varying NOT NULL,
+  last_name character varying NOT NULL,
+  email character varying NOT NULL,
+  subject character varying NOT NULL,
+  message text NOT NULL,
+  status character varying DEFAULT 'unread'::character varying CHECK (status::text = ANY (ARRAY['unread'::character varying, 'read'::character varying, 'replied'::character varying, 'archived'::character varying]::text[])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT contact_messages_pkey PRIMARY KEY (id)
+);
+
 CREATE TABLE public.password_reset_tokens (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   email character varying NOT NULL,
@@ -166,6 +215,7 @@ CREATE TABLE public.password_reset_tokens (
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT password_reset_tokens_pkey PRIMARY KEY (id)
 );
+
 CREATE TABLE public.site_stats (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   total_members integer NOT NULL DEFAULT 0,
@@ -178,39 +228,17 @@ CREATE TABLE public.site_stats (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT site_stats_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.user_sessions (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  account_id uuid NOT NULL,
-  session_token text NOT NULL UNIQUE,
-  device_type USER-DEFINED DEFAULT 'unknown'::device_type,
-  device_name character varying,
-  ip_address inet,
-  user_agent text,
-  location_country character varying,
-  location_city character varying,
-  status USER-DEFINED DEFAULT 'active'::session_status,
-  last_activity timestamp with time zone DEFAULT now(),
-  expires_at timestamp with time zone NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT user_sessions_pkey PRIMARY KEY (id),
-  CONSTRAINT user_sessions_account_id_fkey FOREIGN KEY (account_id) REFERENCES public.accounts(id)
-);
-CREATE TABLE public.users (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  account_id uuid NOT NULL,
-  full_name character varying NOT NULL,
-  field_of_interest character varying,
-  role USER-DEFINED DEFAULT 'Member'::user_role,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT users_pkey PRIMARY KEY (id),
-  CONSTRAINT users_account_id_fkey FOREIGN KEY (account_id) REFERENCES public.accounts(id)
-);
 
 -- =====================================
 -- Enable Row Level Security on storage
 -- =====================================
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- =====================================
+-- Create 'Magazines' bucket if it doesn't exist
+-- =====================================
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('Magazines', 'Magazines', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================
 -- 1️⃣ Admin: CREATE / INSERT (upload)
@@ -218,7 +246,7 @@ ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Admins can upload magazines"
 ON storage.objects
 FOR INSERT
-USING (
+WITH CHECK (
     bucket_id = 'Magazines'
 );
 
