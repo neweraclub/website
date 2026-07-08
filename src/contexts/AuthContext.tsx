@@ -28,21 +28,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session from localStorage
     const getInitialSession = async () => {
       try {
-        console.log('AuthProvider: Initializing...');
         const sessionData = await authHelpers.getCurrentUser();
         
         if (sessionData) {
-          console.log('AuthProvider: Found existing session', sessionData);
           setUser(sessionData.account);
           setUserProfile(sessionData.user);
-        } else {
-          console.log('AuthProvider: No existing session found');
         }
       } catch (error) {
         console.error('AuthProvider: Error during initialization:', error);
       } finally {
         setLoading(false);
-        console.log('AuthProvider: Initialization complete');
       }
     };
 
@@ -83,17 +78,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      console.log('AuthContext: Starting sign in for:', email);
       const { data, error } = await authHelpers.signIn(email, password);
       
       if (error) {
-        console.log('AuthContext: Sign in error:', error);
         return { error };
       }
 
       // Set user data from successful login
       if (data) {
-        console.log('AuthContext: Setting user data, role:', data.user.role);
         setUser(data.account);
         setUserProfile(data.user);
       }

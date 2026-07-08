@@ -516,7 +516,7 @@ const AdminDashboard: React.FC = () => {
         if (error) throw error;
         if (data && data[0]) setSiteStats(data[0] as any);
       }
-      const { data: refreshed, error: rErr } = await supabase.from('site_stats').select('*').limit(1).single();
+      const { data: refreshed, error: rErr } = await supabase.from('site_stats').select('*').limit(1).maybeSingle();
       if (!rErr && refreshed) setSiteStats(refreshed as any);
       showToast('Site stats saved', 'success');
       setIsStatsDialogOpen(false);
@@ -681,7 +681,7 @@ const AdminDashboard: React.FC = () => {
           setCourseEnrollmentStats(stats);
         // Fetch site-wide stats (site_stats table)
         try {
-          const { data: siteStatsData, error: siteStatsError } = await supabase.from('site_stats').select('*').limit(1).single();
+          const { data: siteStatsData, error: siteStatsError } = await supabase.from('site_stats').select('*').limit(1).maybeSingle();
           if (!siteStatsError && siteStatsData) setSiteStats(siteStatsData as any);
         } catch (e) {
           // ignore

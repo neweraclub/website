@@ -59,7 +59,7 @@ export function StatisticsSection() {
     // load site stats from database
     const loadStats = async () => {
       try {
-        const { data, error } = await supabase.from('site_stats').select('total_members, events_hosted, research_projects, success_rate').limit(1).single();
+        const { data, error } = await supabase.from('site_stats').select('total_members, events_hosted, research_projects, success_rate').limit(1).maybeSingle();
         if (!error && data) setDbStats(data as any);
       } catch (e) {}
     };

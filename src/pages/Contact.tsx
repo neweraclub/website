@@ -98,7 +98,7 @@ const Contact = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data, error } = await supabase.from('site_stats').select('contact_email, contact_phone').limit(1).single();
+        const { data, error } = await supabase.from('site_stats').select('contact_email, contact_phone').limit(1).maybeSingle();
         if (!error && data) setSiteStats(data as any);
       } catch (e) {}
     };
