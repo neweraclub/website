@@ -10,6 +10,7 @@ import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection
 import { ResearchSection } from "@/components/sections/ResearchSection";
 import { TeamSection } from "@/components/sections/TeamSection";
 import { RecruitmentSection } from "@/components/sections/RecruitmentSection";
+import { ContactSection } from "@/components/sections/ContactSection";
 import { Footer } from "@/components/sections/Footer";
 import { BackgroundOrbs } from "@/components/3d/BackgroundOrbs";
 import { ApplyModal } from "@/components/ui/ApplyModal";
@@ -59,6 +60,9 @@ export default function Home() {
 
         {/* Recruitment & Admissions Roadmap */}
         <RecruitmentSection onOpenApply={() => setIsApplyModalOpen(true)} />
+
+        {/* Join Us & Contact: Minimal Form with Big 3D Tactile Cluster */}
+        <ContactSection />
 
         {/* Footer: Headquarters, Domain new-era-club.com, Chapter Accreditation */}
         <Footer />

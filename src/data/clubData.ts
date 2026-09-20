@@ -28,12 +28,19 @@ export const CLUB_INFO = {
   shortName: "NEW ERA CLUB",
   tagline: "Advancing Medical Student Excellence & Scientific Innovation",
   officialDomain: "new-era-club.com",
+  email: "contact@new-era-club.com",
   contactEmail: "contact@new-era-club.com",
   recruitmentEmail: "join@new-era-club.com",
   phone: "+213 555 123 456",
   location: "Faculty of Medicine, Academic Hospital Campus",
   description:
     "Club Médical New Era is an elite, dynamic medical student organization dedicated to elevating academic standards, fostering clinical acumen, organizing premier scientific conferences, and leading clinical simulation workshops.",
+  socials: {
+    linkedin: "https://linkedin.com/company/new-era-club",
+    instagram: "https://instagram.com/neweraclub",
+    youtube: "https://youtube.com/@neweraclub",
+    twitter: "https://twitter.com/neweraclub",
+  },
 };
 
 export const SITE_STATS: StatItem[] = [
