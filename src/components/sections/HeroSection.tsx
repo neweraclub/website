@@ -26,7 +26,7 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenApply }) => {
   return (
-    <section className="relative min-h-[92vh] pt-32 sm:pt-36 pb-16 sm:pb-24 flex flex-col justify-center overflow-hidden">
+    <section id="home" className="relative min-h-[92vh] pt-32 sm:pt-36 pb-16 sm:pb-24 flex flex-col justify-center overflow-hidden">
       {/* Background Soft Atmospheric Glows */}
       <div className="absolute top-1/4 -left-32 w-80 sm:w-96 h-80 sm:h-96 rounded-full bg-[#3B33FF]/05 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-0 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] rounded-full bg-[#8B3EE1]/05 blur-[140px] pointer-events-none" />
@@ -58,18 +58,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenApply }) => {
               </span>
             </motion.div>
 
-            {/* Fluid Typography Headline in razor-sharp deep midnight navy-black font */}
-            <h1 className="text-[clamp(2.2rem,5vw,4.4rem)] font-black text-[#0A0F24] tracking-tight leading-[1.08] mb-5 sm:mb-6">
-              Pioneering the{" "}
-              <span className="text-gradient-brand">Future of Medicine</span>, One Student at a Time.
+            {/* Massive Display Headline (Max 6 words) in deep midnight navy-black */}
+            <h1 className="text-[clamp(2.5rem,5.5vw,4.8rem)] font-black text-[#0B0B1A] tracking-tight leading-[1.06] mb-5 sm:mb-6">
+              Elevating the <span className="text-gradient-brand">Future of Medicine</span>.
             </h1>
 
-            {/* Expansive descriptive body text covering clinical simulation, medical congresses, and elite mentorship */}
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-xl mb-8 font-normal">
-              Club Médical New Era is the premier academic society empowering future physicians through immersive <strong className="font-semibold text-[#0A0F24]">clinical simulation</strong>, keynote <strong className="font-semibold text-[#0A0F24]">medical congresses</strong>, and direct <strong className="font-semibold text-[#0A0F24]">elite mentorship</strong> from top residency clinicians.
+            {/* Minimal, punchy, confident single-paragraph line */}
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-lg mb-8 font-normal">
+              Empowering future physicians through clinical simulation, accredited national congresses, and resident mentorship.
             </p>
 
-            {/* Dual CTAs: Sunset orange pill button + warm cream glass button */}
+            {/* Dual CTAs: "Join the Club" + "Upcoming Events" */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto">
               <motion.button
                 whileHover={{ scale: 1.04, y: -2 }}
@@ -77,7 +76,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenApply }) => {
                 onClick={onOpenApply}
                 className="w-full sm:w-auto min-h-[48px] px-8 py-3.5 sm:py-4 rounded-full text-sm font-black text-slate-950 bg-gradient-to-r from-[#F97316] to-[#FACC15] shadow-sunset-glow hover:shadow-[0_0_30px_rgba(249,115,22,0.4)] transition-all duration-300 flex items-center justify-center gap-3 group"
               >
-                <span>Join the New Era</span>
+                <span>Join the Club</span>
                 <ArrowRight className="w-4 h-4 text-slate-950 group-hover:translate-x-1.5 transition-transform" />
               </motion.button>
 
@@ -88,7 +87,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenApply }) => {
                 className="w-full sm:w-auto min-h-[48px] px-7 py-3.5 sm:py-4 rounded-full text-sm font-bold text-[#0A0F24] bg-[#FEFCF7] hover:bg-[#F6EFE4] border border-[#E4DAC8] shadow-xs transition-all duration-300 flex items-center justify-center gap-2.5 hover:border-[#D8CEBA]"
               >
                 <Calendar className="w-4 h-4 text-[#8B3EE1]" />
-                <span>Explore Events</span>
+                <span>Upcoming Events</span>
               </motion.a>
             </div>
 

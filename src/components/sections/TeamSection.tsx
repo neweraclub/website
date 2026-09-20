@@ -174,33 +174,33 @@ export const TeamSection: React.FC = () => {
           </motion.p>
         </div>
 
-        {/* Member Grid with Circular Avatars in Warm Cream Mode */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {/* Member Grid: 4 columns desktop, 2 tablet, 1 mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {TEAM_MEMBERS.map((member) => (
             <div
               key={member.id}
-              className="glass-panel-hover rounded-3xl p-7 sm:p-8 border border-[#E4DAC8] flex flex-col justify-between group text-center bg-[#FEFCF7] shadow-xs"
+              className="relative rounded-3xl p-6 border border-[#E4DAC8] bg-[#FEFCF7] shadow-xs flex flex-col justify-between group text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-transparent hover:ring-2 hover:ring-[#8B3EE1]/50"
             >
               <div className="flex flex-col items-center">
                 {/* Circular Avatar with Brand Gradient Ring */}
-                <div className="relative mb-5">
+                <div className="relative mb-4">
                   <div
-                    className={`w-24 h-24 rounded-full p-1 bg-gradient-to-tr ${member.gradient} shadow-sm transition-transform group-hover:scale-105 duration-300`}
+                    className={`w-20 h-20 rounded-full p-1 bg-gradient-to-tr ${member.gradient} shadow-sm transition-transform group-hover:scale-105 duration-300`}
                   >
-                    <div className="w-full h-full rounded-full bg-[#F6EFE4] flex items-center justify-center text-xl font-black text-[#0A0F24] tracking-wider">
+                    <div className="w-full h-full rounded-full bg-[#F6EFE4] flex items-center justify-center text-lg font-black text-[#0B0B1A] tracking-wider">
                       {member.initials}
                     </div>
                   </div>
-                  <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-[#FEFCF7] border border-[#E4DAC8] text-[#F97316] shadow-xs">
-                    <Award className="w-3.5 h-3.5" />
+                  <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-[#FEFCF7] border border-[#E4DAC8] text-[#F97316] shadow-xs">
+                    <Award className="w-3 h-3" />
                   </div>
                 </div>
 
                 {/* Member Names & Role */}
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#F97316] mb-1">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#F97316] mb-0.5">
                   {member.committee}
                 </span>
-                <h3 className="text-xl font-black text-slate-900 group-hover:text-[#3B33FF] transition-colors">
+                <h3 className="text-lg font-black text-[#0B0B1A] group-hover:text-[#3B33FF] transition-colors leading-snug">
                   {member.name}
                 </h3>
                 <p className="text-xs font-semibold text-[#8B3EE1] mt-0.5">
@@ -211,28 +211,22 @@ export const TeamSection: React.FC = () => {
                 </p>
 
                 {/* Bio */}
-                <p className="text-xs text-slate-600 mt-4 leading-relaxed font-normal">
+                <p className="text-xs text-slate-600 mt-3 leading-relaxed font-normal line-clamp-3">
                   {member.bio}
                 </p>
-
-                {/* Research Focus Badge */}
-                <div className="mt-4 p-3 rounded-2xl bg-slate-50 border border-slate-100 text-[11px] text-slate-600 w-full text-left flex items-start gap-2">
-                  <BookOpen className="w-3.5 h-3.5 text-[#3B33FF] shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">{member.researchFocus}</span>
-                </div>
               </div>
 
-              {/* Social Links with 48px touch targets */}
-              <div className="pt-5 mt-5 border-t border-slate-100 flex items-center justify-center gap-3">
+              {/* Social Links (only show icons that exist) */}
+              <div className="pt-4 mt-4 border-t border-[#E8DFD1] flex items-center justify-center gap-2">
                 {member.links.linkedin && (
                   <a
                     href={member.links.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 text-slate-700 hover:text-white hover:bg-slate-900 transition-all flex items-center justify-center shadow-xs"
+                    className="w-9 h-9 rounded-full bg-[#F6EFE4] border border-[#E4DAC8] text-slate-700 hover:text-white hover:bg-[#3B33FF] transition-all flex items-center justify-center shadow-xs"
                     title="LinkedIn Profile"
                   >
-                    <Linkedin className="w-4 h-4" />
+                    <Linkedin className="w-3.5 h-3.5" />
                   </a>
                 )}
 
@@ -241,10 +235,10 @@ export const TeamSection: React.FC = () => {
                     href={member.links.researchgate}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 text-slate-700 hover:text-white hover:bg-slate-900 transition-all flex items-center justify-center shadow-xs"
+                    className="w-9 h-9 rounded-full bg-[#F6EFE4] border border-[#E4DAC8] text-slate-700 hover:text-white hover:bg-[#8B3EE1] transition-all flex items-center justify-center shadow-xs"
                     title="ResearchGate Publications"
                   >
-                    <FileText className="w-4 h-4" />
+                    <FileText className="w-3.5 h-3.5" />
                   </a>
                 )}
 
@@ -253,10 +247,10 @@ export const TeamSection: React.FC = () => {
                     href={member.links.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 text-slate-700 hover:text-white hover:bg-slate-900 transition-all flex items-center justify-center shadow-xs"
-                    title="GitHub Repositories"
+                    className="w-9 h-9 rounded-full bg-[#F6EFE4] border border-[#E4DAC8] text-slate-700 hover:text-white hover:bg-[#0B0B1A] transition-all flex items-center justify-center shadow-xs"
+                    title="GitHub"
                   >
-                    <Github className="w-4 h-4" />
+                    <Github className="w-3.5 h-3.5" />
                   </a>
                 )}
 
@@ -265,10 +259,10 @@ export const TeamSection: React.FC = () => {
                     href={member.links.portfolio}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 text-slate-700 hover:text-white hover:bg-slate-900 transition-all flex items-center justify-center shadow-xs"
-                    title="Academic Portfolio"
+                    className="w-9 h-9 rounded-full bg-[#F6EFE4] border border-[#E4DAC8] text-slate-700 hover:text-white hover:bg-[#E53888] transition-all flex items-center justify-center shadow-xs"
+                    title="Portfolio"
                   >
-                    <Globe className="w-4 h-4" />
+                    <Globe className="w-3.5 h-3.5" />
                   </a>
                 )}
               </div>

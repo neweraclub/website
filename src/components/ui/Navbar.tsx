@@ -3,7 +3,22 @@
 import React, { useState, useEffect } from "react";
 import { BrandLogo } from "./BrandLogo";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Sparkles, ChevronRight, Globe, Award } from "lucide-react";
+import {
+  ArrowRight,
+  Sparkles,
+  ChevronDown,
+  Calendar,
+  Layers,
+  GraduationCap,
+  BookOpen,
+  FileText,
+  Users,
+  Compass,
+  Bell,
+  Stethoscope,
+  X,
+  Menu,
+} from "lucide-react";
 
 interface NavbarProps {
   onOpenApply: () => void;
@@ -12,6 +27,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenApply }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,7 +37,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApply }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Prevent background scrolling when full-screen mobile drawer is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -30,88 +45,249 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApply }) => {
     }
   }, [mobileMenuOpen]);
 
-  const navLinks = [
-    { label: "About", href: "#about", desc: "Our academic vision & clinical pillars" },
-    { label: "Events", href: "#events", desc: "Scientific congresses & countdown" },
-    { label: "Workshops", href: "#workshops", desc: "Hands-on surgical & diagnostic bootcamps" },
-    { label: "Academic Hub", href: "#academic-hub", desc: "Peer-reviewed research & clerkship guides" },
-    { label: "Our Team", href: "#team", desc: "Executive board & research directors" },
-    { label: "Contact", href: "#contact", desc: "Official campus headquarters" },
-  ];
-
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled || mobileMenuOpen
-          ? "bg-[#FAF6EE]/90 backdrop-blur-[16px] border-b border-[#E8DFD1]/90 shadow-sm py-3"
-          : "bg-[#FAF6EE]/75 backdrop-blur-[16px] py-4 sm:py-5 border-b border-[#E8DFD1]/60"
+        scrolled
+          ? "py-3 bg-[#FAF6EE]/92 backdrop-blur-md border-b border-[#E8DFD1]/80 shadow-xs"
+          : "py-4 sm:py-5 bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Logo on warm organic cream background */}
+        {/* Brand Logo left */}
         <a
-          href="#"
-          className="focus:outline-none min-h-[48px] flex items-center"
+          href="#home"
+          className="focus:outline-none min-h-[44px] flex items-center shrink-0"
           aria-label="Club Médical New Era Home"
         >
           <BrandLogo size="md" inverted={false} />
         </a>
 
-        {/* Desktop Navigation Links: Warm Cream Frosted Capsule */}
-        <nav className="hidden lg:flex items-center gap-1 bg-[#F5EFE4]/80 backdrop-blur-xl px-4 py-1.5 rounded-full border border-[#E8DFD1]/90 shadow-xs">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700 hover:text-[#3B33FF] hover:bg-slate-100/80 transition-all duration-200 tracking-wide"
+        {/* Floating Cream Tinted Pill Bar (Desktop) */}
+        <nav
+          aria-label="Primary Navigation"
+          className="hidden xl:flex items-center gap-1 bg-[#FEFCF7]/95 px-3 py-1.5 rounded-full border border-[#E4DAC8] shadow-xs text-xs font-semibold text-[#0B0B1A]"
+        >
+          {/* 1. Home */}
+          <a
+            href="#home"
+            className="px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all"
+          >
+            Home
+          </a>
+
+          {/* 2. Upcoming Events (Dropdown) */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveDropdown("events")}
+            onMouseLeave={() => setActiveDropdown(null)}
+          >
+            <button
+              className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all"
+              onClick={() =>
+                setActiveDropdown(activeDropdown === "events" ? null : "events")
+              }
             >
-              {link.label}
-            </a>
-          ))}
+              <span>Upcoming Events</span>
+              <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+            </button>
+
+            <AnimatePresence>
+              {activeDropdown === "events" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute top-full left-0 mt-2 w-64 p-2 bg-[#FEFCF7] rounded-2xl border border-[#E4DAC8] shadow-lg flex flex-col gap-1 z-50"
+                >
+                  <a
+                    href="#events"
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F6EFE4] transition-all group"
+                    onClick={() => setActiveDropdown(null)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#F97316]/10 text-[#F97316] flex items-center justify-center shrink-0">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#0B0B1A] group-hover:text-[#3B33FF]">
+                        Future Events & Registration
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-normal">
+                        Upcoming congresses & signups
+                      </div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#events-portfolio"
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F6EFE4] transition-all group"
+                    onClick={() => setActiveDropdown(null)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#8B3EE1]/10 text-[#8B3EE1] flex items-center justify-center shrink-0">
+                      <Layers className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#0B0B1A] group-hover:text-[#8B3EE1]">
+                        Event Websites Portfolio
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-normal">
+                        Past congress milestone microsites
+                      </div>
+                    </div>
+                  </a>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* 3. Medical Training Workshops */}
+          <a
+            href="#workshops"
+            className="px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all flex items-center gap-1.5"
+          >
+            <Stethoscope className="w-3.5 h-3.5 text-[#E53888]" />
+            <span>Workshops</span>
+          </a>
+
+          {/* 4. Announcements & Opportunities */}
+          <a
+            href="#announcements"
+            className="px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all flex items-center gap-1.5"
+          >
+            <Bell className="w-3.5 h-3.5 text-[#F97316]" />
+            <span>Announcements</span>
+          </a>
+
+          {/* 5. Academic Hub (Mega-Dropdown) */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveDropdown("academic")}
+            onMouseLeave={() => setActiveDropdown(null)}
+          >
+            <button
+              className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all"
+              onClick={() =>
+                setActiveDropdown(activeDropdown === "academic" ? null : "academic")
+              }
+            >
+              <span>Academic Hub</span>
+              <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+            </button>
+
+            <AnimatePresence>
+              {activeDropdown === "academic" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute top-full -left-20 mt-2 w-[420px] p-3 bg-[#FEFCF7] rounded-3xl border border-[#E4DAC8] shadow-xl grid grid-cols-2 gap-2 z-50"
+                >
+                  <a
+                    href="#academic-resources"
+                    className="flex flex-col p-3 rounded-2xl hover:bg-[#F6EFE4] transition-all group"
+                    onClick={() => setActiveDropdown(null)}
+                  >
+                    <BookOpen className="w-4 h-4 text-[#3B33FF] mb-2" />
+                    <div className="font-bold text-xs text-[#0B0B1A] group-hover:text-[#3B33FF]">
+                      Study Resources
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">
+                      Clerkship survival guides & OSCE rubrics
+                    </div>
+                  </a>
+
+                  <a
+                    href="#academic-research"
+                    className="flex flex-col p-3 rounded-2xl hover:bg-[#F6EFE4] transition-all group"
+                    onClick={() => setActiveDropdown(null)}
+                  >
+                    <Compass className="w-4 h-4 text-[#8B3EE1] mb-2" />
+                    <div className="font-bold text-xs text-[#0B0B1A] group-hover:text-[#8B3EE1]">
+                      Research & Publications
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">
+                      Student epidemiology fellowships
+                    </div>
+                  </a>
+
+                  <a
+                    href="#academic-papers"
+                    className="flex flex-col p-3 rounded-2xl hover:bg-[#F6EFE4] transition-all group"
+                    onClick={() => setActiveDropdown(null)}
+                  >
+                    <FileText className="w-4 h-4 text-[#E53888] mb-2" />
+                    <div className="font-bold text-xs text-[#0B0B1A] group-hover:text-[#E53888]">
+                      Published Papers
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">
+                      Peer-reviewed indexed journals
+                    </div>
+                  </a>
+
+                  <a
+                    href="#academic-teams"
+                    className="flex flex-col p-3 rounded-2xl hover:bg-[#F6EFE4] transition-all group"
+                    onClick={() => setActiveDropdown(null)}
+                  >
+                    <Users className="w-4 h-4 text-[#F97316] mb-2" />
+                    <div className="font-bold text-xs text-[#0B0B1A] group-hover:text-[#F97316]">
+                      Research Teams
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">
+                      Join active laboratory working groups
+                    </div>
+                  </a>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* 6. Our Team */}
+          <a
+            href="#team"
+            className="px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all"
+          >
+            Our Team
+          </a>
+
+          {/* 7. Contact */}
+          <a
+            href="#contact"
+            className="px-3.5 py-1.5 rounded-full text-slate-700 hover:text-[#3B33FF] hover:bg-[#F6EFE4] transition-all"
+          >
+            Contact
+          </a>
         </nav>
 
-        {/* Desktop Action Button: Warm Sunset Orange to Golden Yellow */}
-        <div className="hidden lg:flex items-center gap-3">
+        {/* Right CTA Button: Join Us */}
+        <div className="hidden sm:flex items-center gap-3">
           <motion.button
-            whileHover={{ scale: 1.04 }}
+            whileHover={{ scale: 1.04, y: -1 }}
             whileTap={{ scale: 0.96 }}
             onClick={onOpenApply}
-            className="group relative inline-flex items-center gap-2 min-h-[44px] px-5 py-2.5 rounded-full text-xs font-black text-slate-950 bg-gradient-to-r from-[#F97316] to-[#FACC15] shadow-sunset-glow transition-all duration-300 hover:shadow-[0_0_25px_rgba(249,115,22,0.4)]"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-black text-slate-950 bg-gradient-to-r from-[#F97316] to-[#FACC15] shadow-sunset-glow hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] transition-all min-h-[44px]"
           >
-            <Sparkles className="w-3.5 h-3.5 text-slate-950 group-hover:rotate-12 transition-transform" />
+            <Sparkles className="w-3.5 h-3.5 text-slate-950" />
             <span>Join Club</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-950 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
           </motion.button>
         </div>
 
-        {/* Mobile Animated Custom Hamburger Button (Minimum 48x48px touch target) */}
-        <div className="flex lg:hidden items-center">
+        {/* Mobile Hamburger Toggle */}
+        <div className="flex xl:hidden items-center gap-2">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="min-w-[48px] min-h-[48px] p-2.5 rounded-2xl bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 flex flex-col items-center justify-center gap-1.5 transition-colors focus:outline-none shadow-xs"
-            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            className="w-11 h-11 rounded-2xl bg-[#FEFCF7] border border-[#E4DAC8] text-[#0B0B1A] flex items-center justify-center transition-colors"
+            aria-label="Toggle menu"
           >
-            {/* Custom Animated 3-Line Hamburger Icon */}
-            <span
-              className={`w-5 h-0.5 bg-slate-800 rounded-full transition-all duration-300 transform origin-center ${
-                mobileMenuOpen ? "rotate-45 translate-y-2" : ""
-              }`}
-            />
-            <span
-              className={`w-5 h-0.5 bg-[#F97316] rounded-full transition-all duration-300 ${
-                mobileMenuOpen ? "opacity-0 scale-0" : "opacity-100"
-              }`}
-            />
-            <span
-              className={`w-5 h-0.5 bg-slate-800 rounded-full transition-all duration-300 transform origin-center ${
-                mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
-              }`}
-            />
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Full-Screen Sleek Slide-Out Mobile Drawer (Light Mode) */}
+      {/* Full-Screen Animated Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -119,61 +295,117 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenApply }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden fixed inset-x-0 top-[65px] sm:top-[73px] bottom-0 bg-white/98 backdrop-blur-2xl border-t border-slate-200 z-40 flex flex-col justify-between overflow-y-auto px-6 py-8 shadow-xl"
+            className="xl:hidden fixed inset-x-0 top-[68px] bottom-0 bg-[#FAF6EE] border-t border-[#E8DFD1] z-40 flex flex-col justify-between overflow-y-auto px-6 py-8"
           >
-            {/* Navigation Links with 48px min touch target and descriptions */}
-            <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#F97316] mb-2 px-3">
-                Navigation Directory
-              </span>
+            <div className="space-y-4">
+              <a
+                href="#home"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-2xl font-black text-[#0B0B1A] hover:text-[#3B33FF]"
+              >
+                Home
+              </a>
+              <div className="border-t border-[#E8DFD1] pt-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#F97316] font-bold">
+                  Events & Congresses
+                </span>
+                <div className="pl-3 mt-2 space-y-2">
+                  <a
+                    href="#events"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-bold text-slate-800"
+                  >
+                    Future Events & Registration
+                  </a>
+                  <a
+                    href="#events-portfolio"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-bold text-slate-800"
+                  >
+                    Event Websites Portfolio
+                  </a>
+                </div>
+              </div>
 
-              {navLinks.map((link, idx) => (
-                <motion.a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  initial={{ opacity: 0, x: -15 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="min-h-[52px] px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200/70 hover:bg-slate-100 text-slate-800 transition-all flex items-center justify-between group"
-                >
-                  <div>
-                    <span className="text-base font-bold text-slate-900 group-hover:text-[#3B33FF] transition-colors">
-                      {link.label}
-                    </span>
-                    <p className="text-[11px] text-slate-500 font-normal">
-                      {link.desc}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#3B33FF] group-hover:translate-x-1 transition-transform" />
-                </motion.a>
-              ))}
+              <a
+                href="#workshops"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-2xl font-black text-[#0B0B1A] hover:text-[#E53888]"
+              >
+                Medical Training Workshops
+              </a>
+
+              <a
+                href="#announcements"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-2xl font-black text-[#0B0B1A] hover:text-[#F97316]"
+              >
+                Announcements & Opportunities
+              </a>
+
+              <div className="border-t border-[#E8DFD1] pt-3">
+                <span className="text-xs font-mono uppercase tracking-widest text-[#8B3EE1] font-bold">
+                  Academic Hub
+                </span>
+                <div className="pl-3 mt-2 space-y-2">
+                  <a
+                    href="#academic-resources"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-bold text-slate-800"
+                  >
+                    Study Resources
+                  </a>
+                  <a
+                    href="#academic-research"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-bold text-slate-800"
+                  >
+                    Research & Publications
+                  </a>
+                  <a
+                    href="#academic-papers"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-bold text-slate-800"
+                  >
+                    Published Papers
+                  </a>
+                  <a
+                    href="#academic-teams"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-bold text-slate-800"
+                  >
+                    Research Teams
+                  </a>
+                </div>
+              </div>
+
+              <a
+                href="#team"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-2xl font-black text-[#0B0B1A] hover:text-[#3B33FF]"
+              >
+                Our Team
+              </a>
+
+              <a
+                href="#contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-2xl font-black text-[#0B0B1A] hover:text-[#8B3EE1]"
+              >
+                Contact
+              </a>
             </div>
 
-            {/* Bottom Drawer Actions */}
-            <div className="pt-6 mt-6 border-t border-slate-200 space-y-4">
+            <div className="pt-8">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenApply();
                 }}
-                className="w-full min-h-[52px] py-3.5 rounded-2xl text-sm font-black text-slate-950 bg-gradient-to-r from-[#F97316] to-[#FACC15] shadow-sunset-glow flex items-center justify-center gap-2.5 active:scale-95 transition-transform"
+                className="w-full py-4 rounded-full text-center font-black text-slate-950 bg-gradient-to-r from-[#F97316] to-[#FACC15] shadow-sunset-glow"
               >
-                <Sparkles className="w-4 h-4 text-slate-950" />
-                <span>Apply for Membership (2026 Season)</span>
-                <ArrowRight className="w-4 h-4 text-slate-950" />
+                Join the New Era Club
               </button>
-
-              <div className="flex items-center justify-between text-xs text-slate-500 px-2 pt-2">
-                <span className="flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5 text-[#F97316]" />
-                  new-era-club.com
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Award className="w-3.5 h-3.5 text-[#3B33FF]" />
-                  Official Chapter
-                </span>
-              </div>
             </div>
           </motion.div>
         )}

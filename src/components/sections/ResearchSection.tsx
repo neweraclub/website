@@ -162,6 +162,19 @@ export const ResearchSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"papers" | "resources" | "teams">("papers");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Sync with anchor hash from navbar mega-dropdown
+  React.useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash === "#academic-resources") setActiveTab("resources");
+      else if (hash === "#academic-papers") setActiveTab("papers");
+      else if (hash === "#academic-teams") setActiveTab("teams");
+    };
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, []);
+
   const filteredPapers = PUBLISHED_PAPERS.filter(
     (p) =>
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

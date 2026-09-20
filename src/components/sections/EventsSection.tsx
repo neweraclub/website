@@ -427,7 +427,7 @@ export const EventsSection: React.FC = () => {
         </motion.div>
 
         {/* Embedded Mini-Portfolios of Past Congresses in Warm Cream Mode */}
-        <div className="glass-panel rounded-3xl p-8 sm:p-12 border border-[#E4DAC8] shadow-sm bg-[#FEFCF7] relative overflow-hidden">
+        <div id="events-portfolio" className="glass-panel rounded-3xl p-8 sm:p-12 border border-[#E4DAC8] shadow-sm bg-[#FEFCF7] relative overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-6 border-b border-[#E8DFD1] gap-4">
             <div>
               <span className="text-xs font-black uppercase tracking-widest text-[#F97316]">
